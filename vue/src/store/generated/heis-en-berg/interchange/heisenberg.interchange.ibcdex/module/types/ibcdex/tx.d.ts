@@ -1,6 +1,18 @@
 import { Reader, Writer } from 'protobufjs/minimal';
 export declare const protobufPackage = "heisenberg.interchange.ibcdex";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgSendBuyOrder {
+    sender: string;
+    port: string;
+    channelID: string;
+    timeoutTimestamp: number;
+    amountDenom: string;
+    amount: number;
+    priceDenom: string;
+    price: number;
+}
+export interface MsgSendBuyOrderResponse {
+}
 export interface MsgSendSellOrder {
     sender: string;
     port: string;
@@ -23,6 +35,20 @@ export interface MsgSendCreatePair {
 }
 export interface MsgSendCreatePairResponse {
 }
+export declare const MsgSendBuyOrder: {
+    encode(message: MsgSendBuyOrder, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): MsgSendBuyOrder;
+    fromJSON(object: any): MsgSendBuyOrder;
+    toJSON(message: MsgSendBuyOrder): unknown;
+    fromPartial(object: DeepPartial<MsgSendBuyOrder>): MsgSendBuyOrder;
+};
+export declare const MsgSendBuyOrderResponse: {
+    encode(_: MsgSendBuyOrderResponse, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): MsgSendBuyOrderResponse;
+    fromJSON(_: any): MsgSendBuyOrderResponse;
+    toJSON(_: MsgSendBuyOrderResponse): unknown;
+    fromPartial(_: DeepPartial<MsgSendBuyOrderResponse>): MsgSendBuyOrderResponse;
+};
 export declare const MsgSendSellOrder: {
     encode(message: MsgSendSellOrder, writer?: Writer): Writer;
     decode(input: Reader | Uint8Array, length?: number): MsgSendSellOrder;
@@ -54,12 +80,14 @@ export declare const MsgSendCreatePairResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    SendBuyOrder(request: MsgSendBuyOrder): Promise<MsgSendBuyOrderResponse>;
     SendSellOrder(request: MsgSendSellOrder): Promise<MsgSendSellOrderResponse>;
     SendCreatePair(request: MsgSendCreatePair): Promise<MsgSendCreatePairResponse>;
 }
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    SendBuyOrder(request: MsgSendBuyOrder): Promise<MsgSendBuyOrderResponse>;
     SendSellOrder(request: MsgSendSellOrder): Promise<MsgSendSellOrderResponse>;
     SendCreatePair(request: MsgSendCreatePair): Promise<MsgSendCreatePairResponse>;
 }

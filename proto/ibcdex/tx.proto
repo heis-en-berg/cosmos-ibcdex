@@ -8,11 +8,26 @@ option go_package = "github.com/heis-en-berg/interchange/x/ibcdex/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc SendBuyOrder(MsgSendBuyOrder) returns (MsgSendBuyOrderResponse);
   rpc SendSellOrder(MsgSendSellOrder) returns (MsgSendSellOrderResponse);
   rpc SendCreatePair(MsgSendCreatePair) returns (MsgSendCreatePairResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgSendBuyOrder {
+  string sender = 1;
+  string port = 2;
+  string channelID = 3;
+  uint64 timeoutTimestamp = 4;
+  string amountDenom = 5;
+  int32 amount = 6;
+  string priceDenom = 7;
+  int32 price = 8;
+}
+
+message MsgSendBuyOrderResponse {
+}
+
 message MsgSendSellOrder {
   string sender = 1;
   string port = 2;

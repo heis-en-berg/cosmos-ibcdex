@@ -4,12 +4,14 @@ import { SpVuexError } from '@starport/vuex';
 import { BuyOrderBook } from "./module/types/ibcdex/buy_order_book";
 import { IbcdexPacketData } from "./module/types/ibcdex/packet";
 import { NoData } from "./module/types/ibcdex/packet";
+import { BuyOrderPacketData } from "./module/types/ibcdex/packet";
+import { BuyOrderPacketAck } from "./module/types/ibcdex/packet";
 import { SellOrderPacketData } from "./module/types/ibcdex/packet";
 import { SellOrderPacketAck } from "./module/types/ibcdex/packet";
 import { CreatePairPacketData } from "./module/types/ibcdex/packet";
 import { CreatePairPacketAck } from "./module/types/ibcdex/packet";
 import { SellOrderBook } from "./module/types/ibcdex/sell_order_book";
-export { BuyOrderBook, IbcdexPacketData, NoData, SellOrderPacketData, SellOrderPacketAck, CreatePairPacketData, CreatePairPacketAck, SellOrderBook };
+export { BuyOrderBook, IbcdexPacketData, NoData, BuyOrderPacketData, BuyOrderPacketAck, SellOrderPacketData, SellOrderPacketAck, CreatePairPacketData, CreatePairPacketAck, SellOrderBook };
 async function initTxClient(vuexGetters) {
     return await txClient(vuexGetters['common/wallet/signer'], {
         addr: vuexGetters['common/env/apiTendermint']
@@ -51,6 +53,8 @@ const getDefaultState = () => {
             BuyOrderBook: getStructure(BuyOrderBook.fromPartial({})),
             IbcdexPacketData: getStructure(IbcdexPacketData.fromPartial({})),
             NoData: getStructure(NoData.fromPartial({})),
+            BuyOrderPacketData: getStructure(BuyOrderPacketData.fromPartial({})),
+            BuyOrderPacketAck: getStructure(BuyOrderPacketAck.fromPartial({})),
             SellOrderPacketData: getStructure(SellOrderPacketData.fromPartial({})),
             SellOrderPacketAck: getStructure(SellOrderPacketAck.fromPartial({})),
             CreatePairPacketData: getStructure(CreatePairPacketData.fromPartial({})),
@@ -193,20 +197,20 @@ export default {
                 throw new SpVuexError('QueryClient:QuerySellOrderBookAll', 'API Node Unavailable. Could not perform query: ' + e.message);
             }
         },
-        async sendMsgSendCreatePair({ rootGetters }, { value, fee = [], memo = '' }) {
+        async sendMsgSendBuyOrder({ rootGetters }, { value, fee = [], memo = '' }) {
             try {
                 const txClient = await initTxClient(rootGetters);
-                const msg = await txClient.msgSendCreatePair(value);
+                const msg = await txClient.msgSendBuyOrder(value);
                 const result = await txClient.signAndBroadcast([msg], { fee: { amount: fee,
                         gas: "200000" }, memo });
                 return result;
             }
             catch (e) {
                 if (e == MissingWalletError) {
-                    throw new SpVuexError('TxClient:MsgSendCreatePair:Init', 'Could not initialize signing client. Wallet is required.');
+                    throw new SpVuexError('TxClient:MsgSendBuyOrder:Init', 'Could not initialize signing client. Wallet is required.');
                 }
                 else {
-                    throw new SpVuexError('TxClient:MsgSendCreatePair:Send', 'Could not broadcast Tx: ' + e.message);
+                    throw new SpVuexError('TxClient:MsgSendBuyOrder:Send', 'Could not broadcast Tx: ' + e.message);
                 }
             }
         },
@@ -227,18 +231,35 @@ export default {
                 }
             }
         },
-        async MsgSendCreatePair({ rootGetters }, { value }) {
+        async sendMsgSendCreatePair({ rootGetters }, { value, fee = [], memo = '' }) {
             try {
                 const txClient = await initTxClient(rootGetters);
                 const msg = await txClient.msgSendCreatePair(value);
-                return msg;
+                const result = await txClient.signAndBroadcast([msg], { fee: { amount: fee,
+                        gas: "200000" }, memo });
+                return result;
             }
             catch (e) {
                 if (e == MissingWalletError) {
                     throw new SpVuexError('TxClient:MsgSendCreatePair:Init', 'Could not initialize signing client. Wallet is required.');
                 }
                 else {
-                    throw new SpVuexError('TxClient:MsgSendCreatePair:Create', 'Could not create message: ' + e.message);
+                    throw new SpVuexError('TxClient:MsgSendCreatePair:Send', 'Could not broadcast Tx: ' + e.message);
+                }
+            }
+        },
+        async MsgSendBuyOrder({ rootGetters }, { value }) {
+            try {
+                const txClient = await initTxClient(rootGetters);
+                const msg = await txClient.msgSendBuyOrder(value);
+                return msg;
+            }
+            catch (e) {
+                if (e == MissingWalletError) {
+                    throw new SpVuexError('TxClient:MsgSendBuyOrder:Init', 'Could not initialize signing client. Wallet is required.');
+                }
+                else {
+                    throw new SpVuexError('TxClient:MsgSendBuyOrder:Create', 'Could not create message: ' + e.message);
                 }
             }
         },
@@ -254,6 +275,21 @@ export default {
                 }
                 else {
                     throw new SpVuexError('TxClient:MsgSendSellOrder:Create', 'Could not create message: ' + e.message);
+                }
+            }
+        },
+        async MsgSendCreatePair({ rootGetters }, { value }) {
+            try {
+                const txClient = await initTxClient(rootGetters);
+                const msg = await txClient.msgSendCreatePair(value);
+                return msg;
+            }
+            catch (e) {
+                if (e == MissingWalletError) {
+                    throw new SpVuexError('TxClient:MsgSendCreatePair:Init', 'Could not initialize signing client. Wallet is required.');
+                }
+                else {
+                    throw new SpVuexError('TxClient:MsgSendCreatePair:Create', 'Could not create message: ' + e.message);
                 }
             }
         },

@@ -26193,6 +26193,8 @@ definitions:
         type: string
       priceDenom:
         type: string
+  heisenberg.interchange.ibcdex.MsgSendBuyOrderResponse:
+    type: object
   heisenberg.interchange.ibcdex.MsgSendCreatePairResponse:
     type: object
   heisenberg.interchange.ibcdex.MsgSendSellOrderResponse:

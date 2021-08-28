@@ -147,6 +147,25 @@ func (am AppModule) OnRecvPacket(
 	// Dispatch packet
 	switch packet := modulePacketData.Packet.(type) {
 	// this line is used by starport scaffolding # ibc/packet/module/recv
+	case *types.IbcdexPacketData_BuyOrderPacket:
+		packetAck, err := am.keeper.OnRecvBuyOrderPacket(ctx, modulePacket, *packet.BuyOrderPacket)
+		if err != nil {
+			ack = channeltypes.NewErrorAcknowledgement(err.Error())
+		} else {
+			// Encode packet acknowledgment
+			packetAckBytes, err := types.ModuleCdc.MarshalJSON(&packetAck)
+			if err != nil {
+				return nil, []byte{}, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+			}
+			ack = channeltypes.NewResultAcknowledgement(sdk.MustSortJSON(packetAckBytes))
+		}
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				types.EventTypeBuyOrderPacket,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+				sdk.NewAttribute(types.AttributeKeyAckSuccess, fmt.Sprintf("%t", err != nil)),
+			),
+		)
 	case *types.IbcdexPacketData_SellOrderPacket:
 		packetAck, err := am.keeper.OnRecvSellOrderPacket(ctx, modulePacket, *packet.SellOrderPacket)
 		if err != nil {
@@ -219,6 +238,12 @@ func (am AppModule) OnAcknowledgementPacket(
 	// Dispatch packet
 	switch packet := modulePacketData.Packet.(type) {
 	// this line is used by starport scaffolding # ibc/packet/module/ack
+	case *types.IbcdexPacketData_BuyOrderPacket:
+		err := am.keeper.OnAcknowledgementBuyOrderPacket(ctx, modulePacket, *packet.BuyOrderPacket, ack)
+		if err != nil {
+			return nil, err
+		}
+		eventType = types.EventTypeBuyOrderPacket
 	case *types.IbcdexPacketData_SellOrderPacket:
 		err := am.keeper.OnAcknowledgementSellOrderPacket(ctx, modulePacket, *packet.SellOrderPacket, ack)
 		if err != nil {
@@ -279,6 +304,11 @@ func (am AppModule) OnTimeoutPacket(
 	// Dispatch packet
 	switch packet := modulePacketData.Packet.(type) {
 	// this line is used by starport scaffolding # ibc/packet/module/timeout
+	case *types.IbcdexPacketData_BuyOrderPacket:
+		err := am.keeper.OnTimeoutBuyOrderPacket(ctx, modulePacket, *packet.BuyOrderPacket)
+		if err != nil {
+			return nil, err
+		}
 	case *types.IbcdexPacketData_SellOrderPacket:
 		err := am.keeper.OnTimeoutSellOrderPacket(ctx, modulePacket, *packet.SellOrderPacket)
 		if err != nil {
