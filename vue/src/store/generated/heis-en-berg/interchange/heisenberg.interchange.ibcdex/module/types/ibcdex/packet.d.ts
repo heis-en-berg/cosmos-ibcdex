@@ -3,14 +3,28 @@ export declare const protobufPackage = "heisenberg.interchange.ibcdex";
 export interface IbcdexPacketData {
     noData: NoData | undefined;
     /** this line is used by starport scaffolding # ibc/packet/proto/field */
+    sellOrderPacket: SellOrderPacketData | undefined;
+    /** this line is used by starport scaffolding # ibc/packet/proto/field/number */
     createPairPacket: CreatePairPacketData | undefined;
 }
 export interface NoData {
 }
 /**
  * this line is used by starport scaffolding # ibc/packet/proto/message
- * CreatePairPacketData defines a struct for the packet payload
+ * SellOrderPacketData defines a struct for the packet payload
  */
+export interface SellOrderPacketData {
+    amountDenom: string;
+    amount: number;
+    priceDenom: string;
+    price: number;
+}
+/** SellOrderPacketAck defines a struct for the packet acknowledgment */
+export interface SellOrderPacketAck {
+    remainingAmount: number;
+    gain: number;
+}
+/** CreatePairPacketData defines a struct for the packet payload */
 export interface CreatePairPacketData {
     sourceDenom: string;
     targetDenom: string;
@@ -31,6 +45,20 @@ export declare const NoData: {
     fromJSON(_: any): NoData;
     toJSON(_: NoData): unknown;
     fromPartial(_: DeepPartial<NoData>): NoData;
+};
+export declare const SellOrderPacketData: {
+    encode(message: SellOrderPacketData, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): SellOrderPacketData;
+    fromJSON(object: any): SellOrderPacketData;
+    toJSON(message: SellOrderPacketData): unknown;
+    fromPartial(object: DeepPartial<SellOrderPacketData>): SellOrderPacketData;
+};
+export declare const SellOrderPacketAck: {
+    encode(message: SellOrderPacketAck, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): SellOrderPacketAck;
+    fromJSON(object: any): SellOrderPacketAck;
+    toJSON(message: SellOrderPacketAck): unknown;
+    fromPartial(object: DeepPartial<SellOrderPacketAck>): SellOrderPacketAck;
 };
 export declare const CreatePairPacketData: {
     encode(message: CreatePairPacketData, writer?: Writer): Writer;

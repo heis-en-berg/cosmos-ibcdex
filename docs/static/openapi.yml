@@ -26195,6 +26195,8 @@ definitions:
         type: string
   heisenberg.interchange.ibcdex.MsgSendCreatePairResponse:
     type: object
+  heisenberg.interchange.ibcdex.MsgSendSellOrderResponse:
+    type: object
   heisenberg.interchange.ibcdex.QueryAllBuyOrderBookResponse:
     type: object
     properties:

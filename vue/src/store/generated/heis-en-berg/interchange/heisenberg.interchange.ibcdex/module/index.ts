@@ -5,10 +5,12 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
 import { MsgSendCreatePair } from "./types/ibcdex/tx";
+import { MsgSendSellOrder } from "./types/ibcdex/tx";
 
 
 const types = [
   ["/heisenberg.interchange.ibcdex.MsgSendCreatePair", MsgSendCreatePair],
+  ["/heisenberg.interchange.ibcdex.MsgSendSellOrder", MsgSendSellOrder],
   
 ];
 export const MissingWalletError = new Error("wallet is required");
@@ -38,6 +40,7 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
     msgSendCreatePair: (data: MsgSendCreatePair): EncodeObject => ({ typeUrl: "/heisenberg.interchange.ibcdex.MsgSendCreatePair", value: data }),
+    msgSendSellOrder: (data: MsgSendSellOrder): EncodeObject => ({ typeUrl: "/heisenberg.interchange.ibcdex.MsgSendSellOrder", value: data }),
     
   };
 };

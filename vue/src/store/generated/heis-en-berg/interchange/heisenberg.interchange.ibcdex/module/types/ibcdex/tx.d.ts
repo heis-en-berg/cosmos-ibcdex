@@ -1,6 +1,18 @@
 import { Reader, Writer } from 'protobufjs/minimal';
 export declare const protobufPackage = "heisenberg.interchange.ibcdex";
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgSendSellOrder {
+    sender: string;
+    port: string;
+    channelID: string;
+    timeoutTimestamp: number;
+    amountDenom: string;
+    amount: number;
+    priceDenom: string;
+    price: number;
+}
+export interface MsgSendSellOrderResponse {
+}
 export interface MsgSendCreatePair {
     sender: string;
     port: string;
@@ -11,6 +23,20 @@ export interface MsgSendCreatePair {
 }
 export interface MsgSendCreatePairResponse {
 }
+export declare const MsgSendSellOrder: {
+    encode(message: MsgSendSellOrder, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): MsgSendSellOrder;
+    fromJSON(object: any): MsgSendSellOrder;
+    toJSON(message: MsgSendSellOrder): unknown;
+    fromPartial(object: DeepPartial<MsgSendSellOrder>): MsgSendSellOrder;
+};
+export declare const MsgSendSellOrderResponse: {
+    encode(_: MsgSendSellOrderResponse, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): MsgSendSellOrderResponse;
+    fromJSON(_: any): MsgSendSellOrderResponse;
+    toJSON(_: MsgSendSellOrderResponse): unknown;
+    fromPartial(_: DeepPartial<MsgSendSellOrderResponse>): MsgSendSellOrderResponse;
+};
 export declare const MsgSendCreatePair: {
     encode(message: MsgSendCreatePair, writer?: Writer): Writer;
     decode(input: Reader | Uint8Array, length?: number): MsgSendCreatePair;
@@ -28,11 +54,13 @@ export declare const MsgSendCreatePairResponse: {
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
+    SendSellOrder(request: MsgSendSellOrder): Promise<MsgSendSellOrderResponse>;
     SendCreatePair(request: MsgSendCreatePair): Promise<MsgSendCreatePairResponse>;
 }
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
+    SendSellOrder(request: MsgSendSellOrder): Promise<MsgSendSellOrderResponse>;
     SendCreatePair(request: MsgSendCreatePair): Promise<MsgSendCreatePairResponse>;
 }
 interface Rpc {

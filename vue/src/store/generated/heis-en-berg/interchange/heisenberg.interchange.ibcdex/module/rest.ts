@@ -18,6 +18,8 @@ export interface IbcdexBuyOrderBook {
 
 export type IbcdexMsgSendCreatePairResponse = object;
 
+export type IbcdexMsgSendSellOrderResponse = object;
+
 export interface IbcdexQueryAllBuyOrderBookResponse {
   BuyOrderBook?: IbcdexBuyOrderBook[];
 

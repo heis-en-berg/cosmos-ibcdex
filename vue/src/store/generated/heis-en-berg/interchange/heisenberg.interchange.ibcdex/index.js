@@ -4,10 +4,12 @@ import { SpVuexError } from '@starport/vuex';
 import { BuyOrderBook } from "./module/types/ibcdex/buy_order_book";
 import { IbcdexPacketData } from "./module/types/ibcdex/packet";
 import { NoData } from "./module/types/ibcdex/packet";
+import { SellOrderPacketData } from "./module/types/ibcdex/packet";
+import { SellOrderPacketAck } from "./module/types/ibcdex/packet";
 import { CreatePairPacketData } from "./module/types/ibcdex/packet";
 import { CreatePairPacketAck } from "./module/types/ibcdex/packet";
 import { SellOrderBook } from "./module/types/ibcdex/sell_order_book";
-export { BuyOrderBook, IbcdexPacketData, NoData, CreatePairPacketData, CreatePairPacketAck, SellOrderBook };
+export { BuyOrderBook, IbcdexPacketData, NoData, SellOrderPacketData, SellOrderPacketAck, CreatePairPacketData, CreatePairPacketAck, SellOrderBook };
 async function initTxClient(vuexGetters) {
     return await txClient(vuexGetters['common/wallet/signer'], {
         addr: vuexGetters['common/env/apiTendermint']
@@ -49,6 +51,8 @@ const getDefaultState = () => {
             BuyOrderBook: getStructure(BuyOrderBook.fromPartial({})),
             IbcdexPacketData: getStructure(IbcdexPacketData.fromPartial({})),
             NoData: getStructure(NoData.fromPartial({})),
+            SellOrderPacketData: getStructure(SellOrderPacketData.fromPartial({})),
+            SellOrderPacketAck: getStructure(SellOrderPacketAck.fromPartial({})),
             CreatePairPacketData: getStructure(CreatePairPacketData.fromPartial({})),
             CreatePairPacketAck: getStructure(CreatePairPacketAck.fromPartial({})),
             SellOrderBook: getStructure(SellOrderBook.fromPartial({})),
@@ -206,6 +210,23 @@ export default {
                 }
             }
         },
+        async sendMsgSendSellOrder({ rootGetters }, { value, fee = [], memo = '' }) {
+            try {
+                const txClient = await initTxClient(rootGetters);
+                const msg = await txClient.msgSendSellOrder(value);
+                const result = await txClient.signAndBroadcast([msg], { fee: { amount: fee,
+                        gas: "200000" }, memo });
+                return result;
+            }
+            catch (e) {
+                if (e == MissingWalletError) {
+                    throw new SpVuexError('TxClient:MsgSendSellOrder:Init', 'Could not initialize signing client. Wallet is required.');
+                }
+                else {
+                    throw new SpVuexError('TxClient:MsgSendSellOrder:Send', 'Could not broadcast Tx: ' + e.message);
+                }
+            }
+        },
         async MsgSendCreatePair({ rootGetters }, { value }) {
             try {
                 const txClient = await initTxClient(rootGetters);
@@ -218,6 +239,21 @@ export default {
                 }
                 else {
                     throw new SpVuexError('TxClient:MsgSendCreatePair:Create', 'Could not create message: ' + e.message);
+                }
+            }
+        },
+        async MsgSendSellOrder({ rootGetters }, { value }) {
+            try {
+                const txClient = await initTxClient(rootGetters);
+                const msg = await txClient.msgSendSellOrder(value);
+                return msg;
+            }
+            catch (e) {
+                if (e == MissingWalletError) {
+                    throw new SpVuexError('TxClient:MsgSendSellOrder:Init', 'Could not initialize signing client. Wallet is required.');
+                }
+                else {
+                    throw new SpVuexError('TxClient:MsgSendSellOrder:Create', 'Could not create message: ' + e.message);
                 }
             }
         },
