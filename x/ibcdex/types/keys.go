@@ -35,3 +35,7 @@ func KeyPrefix(p string) []byte {
 const (
 	SellOrderBookKey = "SellOrderBook-value-"
 )
+
+const (
+	BuyOrderBookKey = "BuyOrderBook-value-"
+)

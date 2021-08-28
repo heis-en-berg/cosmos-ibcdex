@@ -4,6 +4,7 @@ package heisenberg.interchange.ibcdex;
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
+import "ibcdex/buy_order_book.proto";
 import "ibcdex/sell_order_book.proto";
 
 option go_package = "github.com/heis-en-berg/interchange/x/ibcdex/types";
@@ -11,6 +12,17 @@ option go_package = "github.com/heis-en-berg/interchange/x/ibcdex/types";
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
+
+	// Queries a buyOrderBook by index.
+	rpc BuyOrderBook(QueryGetBuyOrderBookRequest) returns (QueryGetBuyOrderBookResponse) {
+		option (google.api.http).get = "/heis-en-berg/interchange/ibcdex/buyOrderBook/{index}";
+	}
+
+	// Queries a list of buyOrderBook items.
+	rpc BuyOrderBookAll(QueryAllBuyOrderBookRequest) returns (QueryAllBuyOrderBookResponse) {
+		option (google.api.http).get = "/heis-en-berg/interchange/ibcdex/buyOrderBook";
+	}
+
 
 	// Queries a sellOrderBook by index.
 	rpc SellOrderBook(QueryGetSellOrderBookRequest) returns (QueryGetSellOrderBookResponse) {
@@ -25,6 +37,22 @@ service Query {
 }
 
 // this line is used by starport scaffolding # 3
+message QueryGetBuyOrderBookRequest {
+	string index = 1;
+}
+
+message QueryGetBuyOrderBookResponse {
+	BuyOrderBook BuyOrderBook = 1;
+}
+
+message QueryAllBuyOrderBookRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllBuyOrderBookResponse {
+	repeated BuyOrderBook BuyOrderBook = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
 message QueryGetSellOrderBookRequest {
 	string index = 1;
 }
