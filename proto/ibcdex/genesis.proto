@@ -1,0 +1,12 @@
+syntax = "proto3";
+package heisenberg.interchange.ibcdex;
+
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/heis-en-berg/interchange/x/ibcdex/types";
+
+// GenesisState defines the ibcdex module's genesis state.
+message GenesisState {
+    // this line is used by starport scaffolding # genesis/proto/state
+    string port_id = 1; // this line is used by starport scaffolding # genesis/proto/stateField
+}

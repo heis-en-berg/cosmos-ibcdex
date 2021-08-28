@@ -1,0 +1,16 @@
+syntax = "proto3";
+package heisenberg.interchange.ibcdex;
+
+option go_package = "github.com/heis-en-berg/interchange/x/ibcdex/types";
+
+message IbcdexPacketData {
+    oneof packet {
+        NoData noData = 1;
+        // this line is used by starport scaffolding # ibc/packet/proto/field
+    }
+}
+
+message NoData {
+}
+
+// this line is used by starport scaffolding # ibc/packet/proto/message

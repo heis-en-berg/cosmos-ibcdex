@@ -84,6 +84,9 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	ibcdexmodule "github.com/heis-en-berg/interchange/x/ibcdex"
+	ibcdexmodulekeeper "github.com/heis-en-berg/interchange/x/ibcdex/keeper"
+	ibcdexmoduletypes "github.com/heis-en-berg/interchange/x/ibcdex/types"
 
 	"github.com/tendermint/spm/cosmoscmd"
 )
@@ -135,6 +138,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		ibcdexmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -202,6 +206,8 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+	ScopedIbcdexKeeper capabilitykeeper.ScopedKeeper
+	IbcdexKeeper       ibcdexmodulekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -236,6 +242,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		ibcdexmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -331,12 +338,25 @@ func New(
 		&stakingKeeper, govRouter,
 	)
 
+	scopedIbcdexKeeper := app.CapabilityKeeper.ScopeToModule(ibcdexmoduletypes.ModuleName)
+	app.ScopedIbcdexKeeper = scopedIbcdexKeeper
+	app.IbcdexKeeper = *ibcdexmodulekeeper.NewKeeper(
+		appCodec,
+		keys[ibcdexmoduletypes.StoreKey],
+		keys[ibcdexmoduletypes.MemStoreKey],
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedIbcdexKeeper,
+	)
+	ibcdexModule := ibcdexmodule.NewAppModule(appCodec, app.IbcdexKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
 	// this line is used by starport scaffolding # ibc/app/router
+	ibcRouter.AddRoute(ibcdexmoduletypes.ModuleName, ibcdexModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	/****  Module Options ****/
@@ -369,6 +389,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
+		ibcdexModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -402,6 +423,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
+		ibcdexmoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -589,6 +611,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(ibcdexmoduletypes.ModuleName)
 
 	return paramsKeeper
 }
